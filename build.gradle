@@ -8,14 +8,14 @@ group = 'com.example'
 version = '0.0.1'
 
 java {
-	sourceCompatibility = '17'
+	sourceCompatibility = "21"
 }
 
 repositories {
 	mavenCentral()
 }
 
-dependencies {
+gitdependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	runtimeOnly 'org.postgresql:postgresql'
