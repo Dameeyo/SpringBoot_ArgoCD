@@ -73,17 +73,6 @@ jobs:
         run: |
           sed -i "s/tag: .*/tag: ${{ env.PROJECT_VERSION }}/" values_staging.yml
 
-      - name: Check if Pull Request exists
-        id: check_pr
-        run: |
-          existing_pr=$(curl -s -X GET \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls?head=main&base=release" | jq '.[0].number')
-          if [[ -n $existing_pr ]]; then
-            echo "pr_number=$existing_pr" >> $GITHUB_ENV
-          fi
-
       - name: Create Pull Request for Production Deployment
         if: env.pr_number == ''
         run: |
