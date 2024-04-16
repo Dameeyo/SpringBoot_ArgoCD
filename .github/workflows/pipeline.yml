@@ -73,15 +73,18 @@ jobs:
         run: |
           sed -i "s/tag: .*/tag: ${{ env.PROJECT_VERSION }}/" values_staging.yml
 
-      - name: Create Pull Request for Production Deployment
+      - name: Create Pull Request
         run: |
           title="Deploy $version to main"
           body="This pull request deploys version $version to main."
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/pulls \
-            -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"main\",\"base\",\"maintainer_can_modify\":true}"
+          response=$(curl -X POST \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"main\",\"base\":\"release\",\"maintainer_can_modify\":true}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls")
+
+          pr_url=$(echo $response | jq -r '.html_url')
+          echo "Pull Request created: $pr_url"
       
 
       - name: Wait for ArgoCD deployment
