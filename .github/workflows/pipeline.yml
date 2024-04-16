@@ -81,13 +81,11 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${{ github.repository }}/pulls?head=main&base=release" | jq '.[0].number')
           if [[ -n $existing_pr ]]; then
-            echo "::set-output name=pr_number::$existing_pr"
-          else
-            echo "::set-output name=pr_number::"
+            echo "pr_number=$existing_pr" >> $GITHUB_ENV
           fi
 
       - name: Create Pull Request for Production Deployment
-        if: steps.check_pr.outputs.pr_number == ''
+        if: env.pr_number == ''
         run: |
           title="Deploy $version to release"
           body="This pull request deploys version $version to release."
@@ -96,7 +94,6 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/pulls \
             -d "{\"title\":\"$title\",\"body\":\"$body\",\"head\":\"main\",\"base\":\"release\"}"
-      
 
       - name: Wait for ArgoCD deployment
         run: |
